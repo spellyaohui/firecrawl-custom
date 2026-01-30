@@ -1,119 +1,117 @@
-# Contributors guide:
+# 贡献指南
 
-Welcome to [Firecrawl](https://firecrawl.dev) 🔥! Here are some instructions on how to get the project locally, so you can run it on your own (and contribute)
+欢迎来到 [Firecrawl](https://firecrawl.dev) 🔥！以下是如何在本地运行项目的说明，以便您可以自行运行（并参与贡献）。
 
-If you're contributing, note that the process is similar to other open source repos i.e. (fork firecrawl, make changes, run tests, PR). If you have any questions, and would like help getting on board, reach out to help@firecrawl.com for more or submit an issue!
+如果您想贡献代码，流程与其他开源项目类似：Fork Firecrawl、进行修改、运行测试、提交 PR。如有任何问题或需要帮助，请发送邮件至 help@firecrawl.com 或提交 Issue！
 
-## Running the project locally
+## 在本地运行项目
 
-First, start by installing dependencies:
+首先，安装以下依赖：
 
-1. node.js [instructions](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)
-2. rust [instructions](https://www.rust-lang.org/tools/install)
-3. pnpm [instructions](https://pnpm.io/installation)
-4. redis [instructions](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/)
-5. postgresql
-6. Docker (optional) (for running postgres)
+1. Node.js [安装说明](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs)
+2. Rust [安装说明](https://www.rust-lang.org/tools/install)
+3. pnpm [安装说明](https://pnpm.io/installation)
+4. Redis [安装说明](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/)
+5. PostgreSQL
+6. Docker（可选，用于运行 PostgreSQL）
 
-You need to set up the PostgreSQL database by running the SQL file at `apps/nuq-postgres/nuq.sql`. Easiest way is to use the docker image inside `apps/nuq-postgres`. With Docker running, build the image:
+您需要通过运行 `apps/nuq-postgres/nuq.sql` 文件来设置 PostgreSQL 数据库。最简单的方法是使用 `apps/nuq-postgres` 目录中的 Docker 镜像。在 Docker 运行的情况下，构建镜像：
 
 ```bash
 docker build -t nuq-postgres .
 ```
 
-and then run:
+然后运行：
 
 ```bash
-docker run --name nuqdb \          
+docker run --name nuqdb \
   -e POSTGRES_PASSWORD=postgres \
   -p 5433:5432 \
   -v nuq-data:/var/lib/postgresql/data \
   -d nuq-postgres
 ```
 
-Set environment variables in a .env in the /apps/api/ directory you can copy over the template in .env.example.
+在 `/apps/api/` 目录中创建 `.env` 文件，可以复制 `.env.example` 模板。
 
-To start, we won't set up authentication, or any optional sub services (pdf parsing, JS blocking support, AI features)
+首先，我们不设置身份验证或任何可选子服务（PDF 解析、JS 阻止支持、AI 功能）。
 
-.env:
+`.env` 文件内容：
 
 ```
-# ===== Required ENVS ======
+# ===== 必需的环境变量 ======
 NUM_WORKERS_PER_QUEUE=8
 PORT=3002
 HOST=0.0.0.0
 REDIS_URL=redis://localhost:6379
 REDIS_RATE_LIMIT_URL=redis://localhost:6379
 
-## To turn on DB authentication, you need to set up supabase.
+## 要启用数据库身份验证，需要设置 Supabase
 USE_DB_AUTHENTICATION=false
 
-## Using the PostgreSQL for queuing -- change if credentials, host, or DB is different
+## 使用 PostgreSQL 进行队列管理 -- 如果凭据、主机或数据库不同，请修改
 NUQ_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres
 
-# ===== Optional ENVS ======
+# ===== 可选的环境变量 ======
 
-# Supabase Setup (used to support DB authentication, advanced logging, etc.)
+# Supabase 设置（用于支持数据库身份验证、高级日志记录等）
 SUPABASE_ANON_TOKEN=
 SUPABASE_URL=
 SUPABASE_SERVICE_TOKEN=
 
-# Other Optionals
-TEST_API_KEY= # use if you've set up authentication and want to test with a real API key
-OPENAI_API_KEY= # add for LLM dependent features (image alt generation, etc.)
+# 其他可选项
+TEST_API_KEY= # 如果已设置身份验证并想使用真实 API 密钥进行测试，请设置此项
+OPENAI_API_KEY= # 添加此项以启用 LLM 相关功能（图像 alt 生成等）
 BULL_AUTH_KEY= @
-PLAYWRIGHT_MICROSERVICE_URL=  # set if you'd like to run a playwright fallback
-LLAMAPARSE_API_KEY= #Set if you have a llamaparse key you'd like to use to parse pdfs
-SLACK_WEBHOOK_URL= # set if you'd like to send slack server health status messages
-
-
+PLAYWRIGHT_MICROSERVICE_URL=  # 如果想运行 Playwright 回退服务，请设置此项
+LLAMAPARSE_API_KEY= # 如果有 LlamaParse 密钥用于解析 PDF，请设置此项
+SLACK_WEBHOOK_URL= # 如果想发送 Slack 服务器健康状态消息，请设置此项
 ```
 
-### Installing dependencies
+### 安装依赖
 
-First, install the dependencies using pnpm.
+首先，使用 pnpm 安装依赖。
 
 ```bash
-# cd apps/api # to make sure you're in the right folder
-pnpm install # make sure you have pnpm version 9+!
+# cd apps/api # 确保您在正确的目录中
+pnpm install # 确保您的 pnpm 版本为 9+！
 ```
 
-### Running the project
+### 运行项目
 
-You're going to need to open 3 terminals.
+您需要打开 3 个终端。
 
-### Terminal 1 - setting up redis
+### 终端 1 - 启动 Redis
 
-Run the command anywhere within your project
+在项目的任意位置运行以下命令：
 
 ```bash
 redis-server
 ```
 
-### Terminal 2 - setting up the service
+### 终端 2 - 启动服务
 
-Now, navigate to the apps/api/ directory and run:
+现在，导航到 `apps/api/` 目录并运行：
 
 ```bash
 pnpm start
-# if you are going to use the [llm-extract feature](https://github.com/firecrawl/firecrawl/pull/586/), you should also export OPENAI_API_KEY=sk-______
+# 如果要使用 [llm-extract 功能](https://github.com/firecrawl/firecrawl/pull/586/)，还需要导出 OPENAI_API_KEY=sk-______
 ```
 
-This will start the workers who are responsible for processing crawl jobs.
+这将启动负责处理爬取任务的 Worker。
 
-### Terminal 3 - sending our first request.
+### 终端 3 - 发送第一个请求
 
-Alright: now let’s send our first request.
+好了，现在让我们发送第一个请求。
 
-```curl
+```bash
 curl -X GET http://localhost:3002/test
 ```
 
-This should return the response Hello, world!
+这应该返回响应 `Hello, world!`
 
-If you’d like to test the crawl endpoint, you can run this
+如果您想测试爬取端点，可以运行：
 
-```curl
+```bash
 curl -X POST http://localhost:3002/v1/crawl \
     -H 'Content-Type: application/json' \
     -d '{
@@ -121,20 +119,20 @@ curl -X POST http://localhost:3002/v1/crawl \
     }'
 ```
 
-### Alternative: Using Docker Compose
+### 替代方案：使用 Docker Compose
 
-For a simpler setup, you can use Docker Compose to run all services:
+为了更简单的设置，您可以使用 Docker Compose 运行所有服务：
 
-1. Prerequisites: Make sure you have Docker and Docker Compose installed
-2. Copy the `.env.example` file to `.env` in the `/apps/api/` directory and configure as needed
-3. From the root directory, run:
+1. 前提条件：确保已安装 Docker 和 Docker Compose
+2. 将 `.env.example` 文件复制到 `/apps/api/` 目录中的 `.env` 并根据需要进行配置
+3. 从根目录运行：
 
 ```bash
 docker compose up
 ```
 
-This will start Redis, the API server, and workers automatically in the correct configuration.
+这将自动以正确的配置启动 Redis、API 服务器和 Worker。
 
-## Tests:
+## 测试
 
-The best way to do this is run the test with `npm run test:snips`.
+运行测试的最佳方式是使用 `npm run test:snips`。

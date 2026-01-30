@@ -1,149 +1,148 @@
-# Self-hosting Firecrawl
+# 自托管 Firecrawl
 
-#### Contributor?
+#### 贡献者？
 
-Welcome to [Firecrawl](https://firecrawl.dev) 🔥! Here are some instructions on how to get the project locally so you can run it on your own and contribute.
+欢迎来到 [Firecrawl](https://firecrawl.dev) 🔥！以下是如何在本地运行项目的说明，以便您可以自行运行并参与贡献。
 
-If you're contributing, note that the process is similar to other open-source repos, i.e., fork Firecrawl, make changes, run tests, PR.
+如果您想贡献代码，流程与其他开源项目类似：Fork Firecrawl、进行修改、运行测试、提交 PR。
 
-If you have any questions or would like help getting on board, join our Discord community [here](https://discord.gg/gSmWdAkdwd) for more information or submit an issue on Github [here](https://github.com/firecrawl/firecrawl/issues/new/choose)!
+如有任何问题或需要帮助，请加入我们的 Discord 社区 [这里](https://discord.gg/gSmWdAkdwd) 获取更多信息，或在 Github 上提交 Issue [这里](https://github.com/firecrawl/firecrawl/issues/new/choose)！
 
-## Why?
+## 为什么要自托管？
 
-Self-hosting Firecrawl is particularly beneficial for organizations with stringent security policies that require data to remain within controlled environments. Here are some key reasons to consider self-hosting:
+自托管 Firecrawl 对于有严格安全策略、要求数据保留在受控环境中的组织特别有益。以下是考虑自托管的一些关键原因：
 
-- **Enhanced Security and Compliance:** By self-hosting, you ensure that all data handling and processing complies with internal and external regulations, keeping sensitive information within your secure infrastructure. Note that Firecrawl is a Mendable product and relies on SOC2 Type2 certification, which means that the platform adheres to high industry standards for managing data security.
-- **Customizable Services:** Self-hosting allows you to tailor the services, such as the Playwright service, to meet specific needs or handle particular use cases that may not be supported by the standard cloud offering.
-- **Learning and Community Contribution:** By setting up and maintaining your own instance, you gain a deeper understanding of how Firecrawl works, which can also lead to more meaningful contributions to the project.
+- **增强的安全性和合规性：** 通过自托管，您可以确保所有数据处理符合内部和外部法规，将敏感信息保留在您的安全基础设施内。请注意，Firecrawl 是 Mendable 的产品，依赖于 SOC2 Type2 认证，这意味着该平台遵循高行业标准来管理数据安全。
+- **可定制的服务：** 自托管允许您定制服务（如 Playwright 服务），以满足特定需求或处理标准云服务可能不支持的特定用例。
+- **学习和社区贡献：** 通过设置和维护您自己的实例，您可以更深入地了解 Firecrawl 的工作原理，这也可能带来对项目更有意义的贡献。
 
-### Considerations
+### 注意事项
 
-However, there are some limitations and additional responsibilities to be aware of:
+但是，有一些限制和额外的责任需要注意：
 
-1. **Limited Access to Fire-engine:** Currently, self-hosted instances of Firecrawl do not have access to Fire-engine, which includes advanced features for handling IP blocks, robot detection mechanisms, and more. This means that while you can manage basic scraping tasks, more complex scenarios might require additional configuration or might not be supported.
-2. **Manual Configuration Required:** If you need to use scraping methods beyond the basic fetch and Playwright options, you will need to manually configure these in the `.env` file. This requires a deeper understanding of the technologies and might involve more setup time.
+1. **Fire-engine 访问受限：** 目前，自托管的 Firecrawl 实例无法访问 Fire-engine，其中包括处理 IP 封锁、机器人检测机制等高级功能。这意味着虽然您可以管理基本的抓取任务，但更复杂的场景可能需要额外配置或可能不受支持。
+2. **需要手动配置：** 如果您需要使用基本 fetch 和 Playwright 选项之外的抓取方法，您需要在 `.env` 文件中手动配置这些。这需要对技术有更深入的了解，可能涉及更多的设置时间。
 
-Self-hosting Firecrawl is ideal for those who need full control over their scraping and data processing environments but comes with the trade-off of additional maintenance and configuration efforts.
+自托管 Firecrawl 非常适合需要完全控制其抓取和数据处理环境的用户，但需要权衡额外的维护和配置工作。
 
-## Steps
+## 步骤
 
-1. First, start by installing the dependencies
+1. 首先，安装依赖
 
-- Docker [instructions](https://docs.docker.com/get-docker/)
+- Docker [安装说明](https://docs.docker.com/get-docker/)
 
 
-2. Set environment variables
+2. 设置环境变量
 
-Create an `.env` in the root directory using the template below.
+使用以下模板在根目录创建 `.env` 文件。
 
-`.env:`
+`.env` 文件内容：
 ```
-# ===== Required ENVS ======
+# ===== 必需的环境变量 ======
 PORT=3002
 HOST=0.0.0.0
 
-# Note: PORT is used by both the main API server and worker liveness check endpoint
+# 注意：PORT 同时用于主 API 服务器和 Worker 存活检查端点
 
-# To turn on DB authentication, you need to set up Supabase.
+# 要启用数据库身份验证，需要设置 Supabase
 USE_DB_AUTHENTICATION=false
 
-# ===== Optional ENVS ======
+# ===== 可选的环境变量 ======
 
-## === AI features (JSON format on scrape, /extract API) ===
-# Provide your OpenAI API key here to enable AI features
+## === AI 功能（抓取时的 JSON 格式、/extract API）===
+# 在此处提供您的 OpenAI API 密钥以启用 AI 功能
 # OPENAI_API_KEY=
 
-# Experimental: Use Ollama
+# 实验性：使用 Ollama
 # OLLAMA_BASE_URL=http://localhost:11434/api
 # MODEL_NAME=deepseek-r1:7b
 # MODEL_EMBEDDING_NAME=nomic-embed-text
 
-# Experimental: Use any OpenAI-compatible API
+# 实验性：使用任何兼容 OpenAI 的 API
 # OPENAI_BASE_URL=https://example.com/v1
 # OPENAI_API_KEY=
 
-## === Proxy ===
-# PROXY_SERVER can be a full URL (e.g. http://0.1.2.3:1234) or just an IP and port combo (e.g. 0.1.2.3:1234)
-# Do not uncomment PROXY_USERNAME and PROXY_PASSWORD if your proxy is unauthenticated
+## === 代理 ===
+# PROXY_SERVER 可以是完整 URL（例如 http://0.1.2.3:1234）或仅 IP 和端口组合（例如 0.1.2.3:1234）
+# 如果您的代理不需要身份验证，请不要取消注释 PROXY_USERNAME 和 PROXY_PASSWORD
 # PROXY_SERVER=
 # PROXY_USERNAME=
 # PROXY_PASSWORD=
 
 ## === /search API ===
-# By default, the /search API will use Google search.
+# 默认情况下，/search API 将使用 Google 搜索。
 
-# You can specify a SearXNG server with the JSON format enabled, if you'd like to use that instead of direct Google.
-# You can also customize the engines and categories parameters, but the defaults should also work just fine.
+# 如果您想使用 SearXNG 而不是直接使用 Google，可以指定启用了 JSON 格式的 SearXNG 服务器。
+# 您还可以自定义 engines 和 categories 参数，但默认值也应该可以正常工作。
 # SEARXNG_ENDPOINT=http://your.searxng.server
 # SEARXNG_ENGINES=
 # SEARXNG_CATEGORIES=
 
-## === Other ===
+## === 其他 ===
 
-# Supabase Setup (used to support DB authentication, advanced logging, etc.)
+# Supabase 设置（用于支持数据库身份验证、高级日志记录等）
 # SUPABASE_ANON_TOKEN=
 # SUPABASE_URL=
 # SUPABASE_SERVICE_TOKEN=
 
-# Use if you've set up authentication and want to test with a real API key
+# 如果已设置身份验证并想使用真实 API 密钥进行测试，请使用此项
 # TEST_API_KEY=
 
-# This key lets you access the queue admin panel. Change this if your deployment is publicly accessible.
+# 此密钥允许您访问队列管理面板。如果您的部署可公开访问，请更改此项。
 BULL_AUTH_KEY=CHANGEME
 
-# This is now autoconfigured by the docker-compose.yaml. You shouldn't need to set it.
+# 这现在由 docker-compose.yaml 自动配置。您不需要设置它。
 # PLAYWRIGHT_MICROSERVICE_URL=http://playwright-service:3000/scrape
 # REDIS_URL=redis://redis:6379
 # REDIS_RATE_LIMIT_URL=redis://redis:6379
-
-## === PostgreSQL Database Configuration ===
-# Configure PostgreSQL credentials. These should match the credentials used by the nuq-postgres container.
-# If you change these, ensure all three are set consistently.
+tgreSQL 数据库配置 ===
+# 配置 PostgreSQL 凭据。这些应与 nuq-postgres 容器使用的凭据匹配。
+# 如果更改这些，请确保所有三个设置一致。
 # POSTGRES_USER=firecrawl
 # POSTGRES_PASSWORD=firecrawl_password
 # POSTGRES_DB=firecrawl
 
-# Set if you have a llamaparse key you'd like to use to parse pdfs
+# 如果您有 LlamaParse 密钥用于解析 PDF，请设置此项
 # LLAMAPARSE_API_KEY=
 
-# Set if you'd like to send server health status messages to Slack
+# 如果您想将服务器健康状态消息发送到 Slack，请设置此项
 # SLACK_WEBHOOK_URL=
 
-## === System Resource Configuration ===
-# Maximum CPU usage threshold (0.0-1.0). Worker will reject new jobs when CPU usage exceeds this value.
-# Default: 0.8 (80%)
+## === 系统资源配置 ===
+# 最大 CPU 使用阈值（0.0-1.0）。当 CPU 使用率超过此值时，Worker 将拒绝新任务。
+# 默认值：0.8（80%）
 # MAX_CPU=0.8
 
-# Maximum RAM usage threshold (0.0-1.0). Worker will reject new jobs when memory usage exceeds this value.
-# Default: 0.8 (80%)
+# 最大 RAM 使用阈值（0.0-1.0）。当内存使用率超过此值时，Worker 将拒绝新任务。
+# 默认值：0.8（80%）
 # MAX_RAM=0.8
 
-# Set if you'd like to allow local webhooks to be sent to your self-hosted instance
+# 如果您想允许将本地 Webhook 发送到您的自托管实例，请设置此项
 # ALLOW_LOCAL_WEBHOOKS=true
 ```
 
-### Security considerations
+### 安全注意事项
 
-- **Use strong PostgreSQL credentials.** The defaults in the `.env` template are for local development only. When deploying to a server, set `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` to secure values and ensure they match the database service configuration.
-- **Keep the database port internal.** The provided `docker-compose.yaml` does not expose PostgreSQL to the host or the internet. Avoid adding a `ports` mapping for `nuq-postgres` unless you are restricting access with a firewall. To access the database for maintenance, prefer using `docker compose exec nuq-postgres psql` or a temporary, firewalled tunnel.
-- **Protect the admin UI.** Set `BULL_AUTH_KEY` to a strong secret, especially on any deployment reachable from untrusted networks.
+- **使用强 PostgreSQL 凭据`.env` 模板中的默认值仅用于本地开发。部署到服务器时，请将 `POSTGRES_USER`、`POSTGRES_PASSWORD` 和 `POSTGRES_DB` 设置为安全值，并确保它们与数据库服务配置匹配。
+- **保持数据库端口内部化。** 提供的 `docker-compose.yaml` 不会将 PostgreSQL 暴露给主机或互联网。除非您使用防火墙限制访问，否则避免为 `nuq-postgres` 添加 `ports` 映射。要访问数据库进行维护，建议使用 `docker compose exec nuq-postgres psql` 或临时的、有防火墙保护的隧道。
+- **保护管理 UI。** 将 `BULL_AUTH_KEY` 设置为强密钥，特别是在任何可从不受信任网络访问的部署上。
 
-3.  Build and run the Docker containers:
+3. 构建并运行 Docker 容器：
 
     ```bash
     docker compose build
     docker compose up
     ```
 
-    If you encounter an error, make sure you're using `docker compose` and not `docker-compose`.
-    
-    This will run a local instance of Firecrawl which can be accessed at `http://localhost:3002`.
-    
-    You should be able to see the Bull Queue Manager UI on `http://localhost:3002/admin/CHANGEME/queues`.
+    如果遇到错误，请确保使用的是 `docker compose` 而不是 `docker-compose`。
 
-5. *(Optional)* Test the API
+    这将运行一个本地 Firecrawl 实例，可以通过 `http://localhost:3002` 访问。
 
-If you’d like to test the crawl endpoint, you can run this:
+    您应该能够在 `http://localhost:3002/admin/CHANGEME/queues` 看到 Bull 队列管理器 UI。
+
+5. *（可选）* 测试 API
+
+如果您想测试爬取端点，可以运行：
 
   ```bash
   curl -X POST http://localhost:3002/v1/crawl \
@@ -151,77 +150,77 @@ If you’d like to test the crawl endpoint, you can run this:
       -d '{
         "url": "https://firecrawl.dev"
       }'
-  ```   
+  ```
 
-## Troubleshooting
+## 故障排除
 
-This section provides solutions to common issues you might encounter while setting up or running your self-hosted instance of Firecrawl.
+本节提供您在设置或运行自托管 Firecrawl 实例时可能遇到的常见问题的解决方案。
 
-### API Keys for SDK Usage
+### SDK 使用的 API 密钥
 
-**Note:** When using Firecrawl SDKs with a self-hosted instance, API keys are optional. API keys are only required when connecting to the cloud service (api.firecrawl.dev).
+**注意：** 在自托管实例中使用 Firecrawl SDK 时，API 密钥是可选的。API 密钥仅在连接到云服务 (api.firecrawl.dev) 时才需要。
 
-### Supabase client is not configured
+### Supabase 客户端未配置
 
-**Symptom:**
+**症状：**
 ```bash
 [YYYY-MM-DDTHH:MM:SS.SSSz]ERROR - Attempted to access Supabase client when it's not configured.
 [YYYY-MM-DDTHH:MM:SS.SSSz]ERROR - Error inserting scrape event: Error: Supabase client is not configured.
 ```
 
-**Explanation:**
-This error occurs because the Supabase client setup is not completed. You should be able to scrape and crawl with no problems. Right now it's not possible to configure Supabase in self-hosted instances.
+**说明：**
+此错误是因为 Supabase 客户端设置未完成。您应该能够正常进行抓取和爬取。目前无法在自托管实例中配置 Supabase。
 
-### You're bypassing authentication
+### 您正在绕过身份验证
 
-**Symptom:**
+**症状：**
 ```bash
 [YYYY-MM-DDTHH:MM:SS.SSSz]WARN - You're bypassing authentication
 ```
 
-**Explanation:**
-This error occurs because the Supabase client setup is not completed. You should be able to scrape and crawl with no problems. Right now it's not possible to configure Supabase in self-hosted instances.
+**说明：**
+此错误是因为 Supabase 客户端设置未完成。您应该能够正常进行抓取和爬取。目前无法在自托管实例中配置 Supabase。
 
-### Docker containers fail to start
+### Docker 容器无法启动
 
-**Symptom:**
-Docker containers exit unexpectedly or fail to start.
+**症状：**
+Docker 容器意外退出或无法启动。
 
-**Solution:**
-Check the Docker logs for any error messages using the command:
+**解决方案：**
+使用以下命令检查 Docker 日志中的任何错误消息：
 ```bash
 docker logs [container_name]
 ```
 
-- Ensure all required environment variables are set correctly in the .env file.
-- Verify that all Docker services defined in docker-compose.yml are correctly configured and the necessary images are available.
+- 确保 `.env` 文件中正确设置了所有必需的环境变量。
+- 验证 `docker-compose.yml` 中定义的所有 Docker 服务是否正确配置，以及必要的镜像是否可用。
 
-### Connection issues with Redis
+### Redis 连接问题
 
-**Symptom:**
-Errors related to connecting to Redis, such as timeouts or "Connection refused".
+**症状：**
+与 Redis 连接相关的错误，如超时或"连接被拒绝"。
 
-**Solution:**
-- Ensure that the Redis service is up and running in your Docker environment.
-- Verify that the REDIS_URL and REDIS_RATE_LIMIT_URL in your .env file point to the correct Redis instance, ensure that it points to the same URL in the `docker-compose.yaml` file (`redis://redis:6379`)
-- Check network settings and firewall rules that may block the connection to the Redis port.
+**解决方案：**
+- 确保 Redis 服务在您的 Docker 环境中正在运行。
+- 验证 `.env` 文件中的 `REDIS_URL` 和 `REDIS_RATE_LIMIT_URL` 指向正确的 Redis 实例，确保它指向 `docker-compose.yaml` 文件中的相同 URL（`redis://redis:6379`）。
+- 检查可能阻止连接到 Redis 端口的网络设置和防火墙规则。
 
-### API endpoint does not respond
+### API 端点无响应
 
-**Symptom:**
-API requests to the Firecrawl instance timeout or return no response.
+**症状：**
+对 Firecrawl 实例的 API 请求超时或无响应。
 
-**Solution:**
-- Ensure that the Firecrawl service is running by checking the Docker container status.
-- Verify that the PORT and HOST settings in your .env file are correct and that no other service is using the same port.
-- Check the network configuration to ensure that the host is accessible from the client making the API request.
+**解决方案：**
+- 通过检查 Docker 容器状态确保 Firecrawl 服务正在运行。
+- 验证 `.env` 文件中的 `PORT` 和 `HOST` 设置是否正确，以及没有其他服务使用相同的端口。
+- 检查网络配置以确保主机可从发出 API 请求的客户端访问。
 
-By addressing these common issues, you can ensure a smoother setup and operation of your self-hosted Firecrawl instance.
+通过解决这些常见问题，您可以确保自托管 Firecrawl 实例的设置和运行更加顺畅。
 
-## Install Firecrawl on a Kubernetes Cluster (Simple Version)
+## 在 Kubernetes 集群上安装 Firecrawl（简单版本）
 
-Read the [examples/kubernetes/cluster-install/README.md](https://github.com/firecrawl/firecrawl/blob/main/examples/kubernetes/cluster-install/README.md) for instructions on how to install Firecrawl on a Kubernetes Cluster.
+阅读 [examples/kubernetes/cluster-install/README.md](https://github.com/firecrawl/firecrawl/blob/main/examples/kubernetes/cluster-install/README.md) 了解如何在 Kubernetes 集群上安装 Firecrawl 的说明。
 
-## Install Firecrawl on a Kubernetes Cluster with Helm
+## 使用 Helm 在 Kubernetes 集群上安装 Firecrawl
 
-Read the [examples/kubernetes/firecrawl-helm/README.md](https://github.com/firecrawl/firecrawl/blob/main/examples/kubernetes/firecrawl-helm/README.md) for instructions on how to install Firecrawl on a Kubernetes Cluster with Helm.
+阅读 [examples/kubernetes/firecrawl-helm/README.md](https://github.com/firecrawl/firecrawl/blob/main/examples/kubernetes/firecrawl-helm/README.md) 了解如何使用 Helm 在 Kubernetes 集群上安装 Firecrawl 的说明。
